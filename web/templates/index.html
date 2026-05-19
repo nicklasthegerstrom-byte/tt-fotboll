@@ -2,35 +2,163 @@
 <html lang="sv">
 <head>
     <meta charset="UTF-8">
-    <title>TT Fotboll — Testvy</title>
+    <title>TT Media Manager — Bildtextgenerator</title>
     <style>
-        body { font-family: sans-serif; background: #f4f6f8; padding: 40px; }
-        .box { max-width: 800px; margin: 0 auto; background: white; padding: 25px; border-radius: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        h1 { color: #d9534f; }
-        .team { margin-top: 20px; padding: 15px; background: #fafafa; border: 1px solid #ddd; }
+        body { font-family: -apple-system, sans-serif; background: #f0f2f5; padding: 20px; color: #1a1a1a; }
+        .wrapper { max-width: 1000px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.06); }
+        h1 { color: #d9534f; margin-top: 0; font-size: 22px; text-transform: uppercase; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        
+        /* Inställningar för kortkommandon */
+        .shortcut-settings { display: flex; gap: 20px; background: #e9ecef; padding: 15px; border-radius: 6px; margin-bottom: 20px; }
+        .shortcut-group { display: flex; align-items: center; gap: 10px; }
+        .shortcut-group input { width: 40px; padding: 6px; font-size: 16px; text-align: center; font-weight: bold; text-transform: uppercase; border: 1px solid #ccc; border-radius: 4px; }
+        
+        /* Huvudrutan för bildtexten */
+        .macro-box { background: #fff3cd; border: 1px solid #ffeeba; padding: 20px; border-radius: 6px; margin-bottom: 25px; }
+        .macro-box label { font-weight: bold; display: block; margin-bottom: 8px; color: #856404; }
+        .macro-box input { width: 100%; padding: 12px; font-size: 16px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        
+        .toast { display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #28a745; color: white; padding: 12px 30px; border-radius: 4px; font-weight: bold; z-index: 1000; }
+        .preview-area { background: #f8f9fa; padding: 15px; border-radius: 4px; margin-bottom: 20px; font-family: monospace; font-size: 14px; white-space: pre-wrap; display: none; border-left: 5px solid #d9534f; }
+        
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; opacity: 0.8; }
+        .team { background: #fafafa; border: 1px solid #ddd; padding: 15px; border-radius: 4px; }
+        .team h3 { margin-top: 0; border-bottom: 2px solid #333; padding-bottom: 5px; }
     </style>
+    
+    <script>
+        // Sparar lagdatan från backend
+        const matchData = {{ data|tojson|safe if data else 'null' }};
+        const meta = {{ meta|tojson|safe if meta else '{}' }};
+
+        function visaToast(text) {
+            let t = document.getElementById('toast');
+            t.innerText = text;
+            t.style.display = 'block';
+            setTimeout(() => { t.style.display = 'none'; }, 2000);
+        }
+
+        // Variabel för att spara den genererade texten så att den kan kopieras vid Enter
+        let globalGenereradText = "";
+
+        function processMacro(inputElement) {
+            if (!matchData || matchData.teams.length < 2) return;
+            
+            let val = inputElement.value;
+            
+            // Hämta dina egna valda kortkommandon från skärmen
+            let cmdLag1 = document.getElementById('cmd-lag1').value.toLowerCase();
+            let cmdLag2 = document.getElementById('cmd-lag2').value.toLowerCase();
+            
+            // Dynamisk regex baserad på vad du har skrivit i rutorna
+            // Letar efter t.ex. startbokstav följt av siffror och ett mellanslag
+            let regex = /^([a-zA-ZöÖäÄåÅ])(\d+)\s(.*)/;
+            let match = val.match(regex);
+            
+            if (match) {
+                let inskrivenBokstav = match[1].toLowerCase();
+                let tröjnummer = match[2];
+                let restenAvTexten = match[3];
+                
+                let lag1 = matchData.teams[0];
+                let lag2 = matchData.teams[1];
+                
+                let sökLag = null;
+                let lagKortnamn = "";
+                
+                // Matchar bokstaven mot dina valda kommandon
+                if (inskrivenBokstav === cmdLag1) {
+                    sökLag = lag1;
+                    lagKortnamn = `${lag1.name}:s`; // Blir t.ex. "IFK Göteborg:s" eller vad du har i replacements
+                } else if (inskrivenBokstav === cmdLag2) {
+                    sökLag = lag2;
+                    lagKortnamn = `${lag2.name}:s`;
+                }
+                
+                if (sökLag) {
+                    // Leta efter spelaren baserat på tröjnummer
+                    let spelare = sökLag.startelva.find(p => p.number == tröjnummer);
+                    
+                    if (spelare) {
+                        let spelarNamn = `${spelare.firstName} ${spelare.lastName}`;
+                        
+                        // Bygg ihop hela TT-paketet
+                        let bildtext = `${meta.ort_datum}\n`;
+                        bildtext += `${lagKortnamn} ${spelarNamn} ${restenAvTexten} under fotbollsmatchen i ${meta.serienamn} mellan ${lag1.name} and ${lag2.name} på ${meta.arena}. ${meta.extratext}\n`;
+                        bildtext += `Foto: ${meta.fotograf} / ${meta.kod}`;
+                        
+                        // Spara undan och visa i förhandsgranskningen
+                        globalGenereradText = bildtext;
+                        let preview = document.getElementById('preview');
+                        preview.innerText = bildtext;
+                        preview.style.display = 'block';
+                        return;
+                    }
+                }
+            }
+            
+            // Om det inte matchar något kommando, göm förhandsgranskningen
+            document.getElementById('preview').style.display = 'none';
+            globalGenereradText = "";
+        }
+
+        function hanteraKeypress(e) {
+            // När du trycker på Enter och vi har en genererad text
+            if (e.key === 'Enter' && globalGenereradText) {
+                // Kopiera till urklipp automatiskt
+                navigator.clipboard.writeText(globalGenereradText);
+                visaToast("✓ Bildtext kopierad till urklipp!");
+                
+                // Töm textfältet och förhandsgranskningen så du kan köra nästa direkt
+                e.target.value = '';
+                document.getElementById('preview').style.display = 'none';
+                globalGenereradText = "";
+            }
+        }
+    </script>
 </head>
 <body>
-    <div class="box">
-        <h1>TT Fotbolls-app: Mottagningstest</h1>
+
+    <div id="toast" class="toast">Kopierat!</div>
+
+    <div class="wrapper">
+        <h1>TT Media Manager — Bildtextgenerator</h1>
         
         {% if data %}
-            <h2>Match-ID: {{ data.matchId }}</h2>
-            <p style="color: green; font-weight: bold;">✓ Matchdata laddades in utan filuppladdning!</p>
-            
-            {% for team in data.teams %}
-                <div class="team">
-                    <h3>{{ team.name }}</h3>
-                    <ul>
-                        {% for p in team.startelva %}
-                            <li>#{{ p.number }} {{ p.firstName }} {{ p.lastName }} (Mål: {{ p.goals }}, Assist: {{ p.assists }})</li>
-                        {% endfor %}
-                    </ul>
+            <div class="shortcut-settings">
+                <div class="shortcut-group">
+                    <label for="cmd-lag1">Kortkommando för <b>{{ data.teams[0].name }}</b>:</label>
+                    <input type="text" id="cmd-lag1" maxlength="1" value="Ö">
                 </div>
-            {% endfor %}
+                <div class="shortcut-group">
+                    <label for="cmd-lag2">Kortkommando för <b>{{ data.teams[1].name }}</b>:</label>
+                    <input type="text" id="cmd-lag2" maxlength="1" value="G">
+                </div>
+            </div>
+
+            <div class="macro-box">
+                <label for="macro-input">Skriv snabbkod (t.ex. <span style="font-family: monospace;">G6 jublar efter 1-0</span>) och tryck Enter:</label>
+                <input type="text" id="macro-input" oninput="processMacro(this)" onkeypress="hanteraKeypress(event)" placeholder="Skriv här... tryck Enter för att kopiera och rensa" autofocus>
+            </div>
+
+            <div id="preview" class="preview-area"></div>
+
+            <div class="grid">
+                {% for team in data.teams %}
+                    <div class="team">
+                        <h3>{{ team.name }}</h3>
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); font-size: 13px; gap: 4px;">
+                            {% for p in team.startelva %}
+                                <div><b>#{{ p.number }}</b> {{ p.firstName }} {{ p.lastName }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
         {% else %}
-            <p>Ingen match laddad ännu. Gå till svenskfotboll.se och klicka på ditt bokmärke!</p>
+            <p>Ingen match laddad ännu. Använd ditt bokmärke på svenskfotboll.se för att skicka hit matchen!</p>
         {% endif %}
     </div>
+
 </body>
 </html>
