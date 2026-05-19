@@ -28,8 +28,9 @@
     
     <script>
         // Sparar lagdatan från backend
-        const matchData = {{ data|tojson|safe if data else 'null' }};
-        const meta = {{ meta|tojson|safe if meta else '{}' }};
+       
+        const matchData = JSON.parse('{{ data|tojson|safe if data else "null" }}');
+        const meta = JSON.parse('{{ meta|tojson|safe if meta else "{}" }}');
 
         function visaToast(text) {
             let t = document.getElementById('toast');
@@ -38,7 +39,7 @@
             setTimeout(() => { t.style.display = 'none'; }, 2000);
         }
 
-        // Variabel för att spara den genererade texten så att den kan kopieras vid Enter
+        // Variabel för att spara den genererade texten
         let globalGenereradText = "";
 
         function processMacro(inputElement) {
@@ -46,12 +47,10 @@
             
             let val = inputElement.value;
             
-            // Hämta dina egna valda kortkommandon från skärmen
             let cmdLag1 = document.getElementById('cmd-lag1').value.toLowerCase();
             let cmdLag2 = document.getElementById('cmd-lag2').value.toLowerCase();
             
-            // Dynamisk regex baserad på vad du har skrivit i rutorna
-            // Letar efter t.ex. startbokstav följt av siffror och ett mellanslag
+            // Matchar t.ex. G6, Ö44, g14 följt av ett mellanslag och resten av texten
             let regex = /^([a-zA-ZöÖäÄåÅ])(\d+)\s(.*)/;
             let match = val.match(regex);
             
@@ -66,17 +65,16 @@
                 let sökLag = null;
                 let lagKortnamn = "";
                 
-                // Matchar bokstaven mot dina valda kommandon
                 if (inskrivenBokstav === cmdLag1) {
                     sökLag = lag1;
-                    lagKortnamn = `${lag1.name}:s`; // Blir t.ex. "IFK Göteborg:s" eller vad du har i replacements
+                    lagKortnamn = `${lag1.name}:s`;
                 } else if (inskrivenBokstav === cmdLag2) {
                     sökLag = lag2;
                     lagKortnamn = `${lag2.name}:s`;
                 }
                 
                 if (sökLag) {
-                    // Leta efter spelaren baserat på tröjnummer
+                    // Leta efter spelaren i det valda laget
                     let spelare = sökLag.startelva.find(p => p.number == tröjnummer);
                     
                     if (spelare) {
@@ -84,10 +82,9 @@
                         
                         // Bygg ihop hela TT-paketet
                         let bildtext = `${meta.ort_datum}\n`;
-                        bildtext += `${lagKortnamn} ${spelarNamn} ${restenAvTexten} under fotbollsmatchen i ${meta.serienamn} mellan ${lag1.name} and ${lag2.name} på ${meta.arena}. ${meta.extratext}\n`;
+                        bildtext += `${lagKortnamn} ${spelarNamn} ${restenAvTexten} under fotbollsmatchen i ${meta.serienamn} mellan ${lag1.name} och ${lag2.name} på ${meta.arena}. ${meta.extratext}\n`;
                         bildtext += `Foto: ${meta.fotograf} / ${meta.kod}`;
                         
-                        // Spara undan och visa i förhandsgranskningen
                         globalGenereradText = bildtext;
                         let preview = document.getElementById('preview');
                         preview.innerText = bildtext;
@@ -97,22 +94,29 @@
                 }
             }
             
-            // Om det inte matchar något kommando, göm förhandsgranskningen
+            // Om texten inte matchar ett kommando ännu, rensa förhandsgranskningen
             document.getElementById('preview').style.display = 'none';
             globalGenereradText = "";
         }
 
-        function hanteraKeypress(e) {
-            // När du trycker på Enter och vi har en genererad text
-            if (e.key === 'Enter' && globalGenereradText) {
-                // Kopiera till urklipp automatiskt
-                navigator.clipboard.writeText(globalGenereradText);
-                visaToast("✓ Bildtext kopierad till urklipp!");
+        // KORRIGERAD: Denna funktion fångar upp Enter-trycket ordentligt
+        function hanteraKeypress(event) {
+            if (event.key === 'Enter') {
+                // Hindra att sidan gör något annat (t.ex. laddar om)
+                event.preventDefault(); 
                 
-                // Töm textfältet och förhandsgranskningen så du kan köra nästa direkt
-                e.target.value = '';
-                document.getElementById('preview').style.display = 'none';
-                globalGenereradText = "";
+                if (globalGenereradText) {
+                    // Kopiera till urklipp
+                    navigator.clipboard.writeText(globalGenereradText);
+                    visaToast("✓ Bildtext kopierad till urklipp!");
+                    
+                    // Töm fältet direkt så redaktören kan skriva nästa bild
+                    document.getElementById('macro-input').value = '';
+                    document.getElementById('preview').style.display = 'none';
+                    globalGenereradText = "";
+                } else {
+                    visaToast("⚠️ Skriv en giltig kod först (t.ex. G14...)");
+                }
             }
         }
     </script>
