@@ -2,30 +2,247 @@
 <html lang="sv">
 <head>
     <meta charset="UTF-8">
-    <title>TT Media Manager — Bildtext-ihopslagning</title>
+    <title>TT Nyhetsbyrån — Bildtextgenerator</title>
     <style>
-        body { font-family: -apple-system, sans-serif; background: #f0f2f5; padding: 20px; color: #1a1a1a; }
-        .wrapper { max-width: 1000px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.06); }
-        h1 { color: #d9534f; margin-top: 0; font-size: 22px; text-transform: uppercase; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        /* TT Nyhetsbyrån Brand Identity - Global Styles */
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+            background: #f8f9fa; 
+            margin: 0;
+            padding: 30px; 
+            color: #1a1a1a; 
+            line-height: 1.5;
+        }
         
-        .setup-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 20px; background: #e9ecef; padding: 20px; border-radius: 6px; margin-bottom: 20px; }
-        .setup-section h3 { margin-top: 0; margin-bottom: 10px; font-size: 14px; text-transform: uppercase; color: #495057; }
-        .shortcut-group { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-        .shortcut-group input { width: 40px; padding: 6px; font-size: 16px; text-align: center; font-weight: bold; text-transform: uppercase; border: 1px solid #ccc; border-radius: 4px; }
+        .wrapper { 
+            max-width: 1100px; 
+            margin: 0 auto; 
+            background: #ffffff; 
+            padding: 35px; 
+            border-radius: 4px; 
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); 
+            border-top: 5px solid #d9381e; /* Den officiella djupa TT-röda färgen */
+        }
         
-        .input-field { width: 100%; padding: 8px; font-size: 14px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
-        textarea.input-field { height: 60px; font-family: sans-serif; resize: vertical; }
+        /* Header i TT-stil */
+        .header-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #e5e5e5;
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+        
+        h1 { 
+            margin: 0; 
+            font-size: 24px; 
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            color: #1a1a1a;
+        }
+        
+        h1 span {
+            color: #d9381e;
+        }
+        
+        .badge-internal {
+            background: #222222;
+            color: #ffffff;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 3px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        /* Inställningspanel */
+        .setup-grid { 
+            display: grid; 
+            grid-template-columns: 1fr 2fr; 
+            gap: 25px; 
+            background: #f1f3f5; 
+            padding: 20px; 
+            border-radius: 4px; 
+            margin-bottom: 25px; 
+            border: 1px solid #e5e5e5;
+        }
+        
+        .setup-section h3 { 
+            margin-top: 0; 
+            margin-bottom: 15px; 
+            font-size: 13px; 
+            text-transform: uppercase; 
+            letter-spacing: 0.5px;
+            color: #6c757d; 
+        }
+        
+        .shortcut-group { 
+            display: flex; 
+            align-items: center; 
+            gap: 12px; 
+            margin-bottom: 12px; 
+        }
+        
+        .shortcut-group input { 
+            width: 45px; 
+            padding: 8px; 
+            font-size: 16px; 
+            text-align: center; 
+            font-weight: bold; 
+            text-transform: uppercase; 
+            border: 1px solid #ced4da; 
+            border-radius: 4px; 
+            color: #1a1a1a;
+        }
+        
+        .shortcut-group input:focus {
+            outline: none;
+            border-color: #d9381e;
+            box-shadow: 0 0 0 3px rgba(217, 56, 30, 0.15);
+        }
+        
+        .shortcut-group label {
+            font-size: 14px;
+            font-weight: 500;
+            color: #343a40;
+        }
+        
+        .input-field { 
+            width: 100%; 
+            padding: 10px; 
+            font-size: 14px; 
+            border: 1px solid #ced4da; 
+            border-radius: 4px; 
+            box-sizing: border-box; 
+            color: #1a1a1a;
+            background: #ffffff;
+        }
+        
+        .input-field:focus {
+            outline: none;
+            border-color: #d9381e;
+            box-shadow: 0 0 0 3px rgba(217, 56, 30, 0.15);
+        }
+        
+        textarea.input-field { 
+            height: 70px; 
+            font-family: inherit; 
+            resize: vertical; 
+            line-height: 1.4;
+        }
 
-        .macro-box { background: #fff3cd; border: 1px solid #ffeeba; padding: 20px; border-radius: 6px; margin-bottom: 25px; }
-        .macro-box label { font-weight: bold; display: block; margin-bottom: 8px; color: #856404; }
-        .macro-box input { width: 100%; padding: 12px; font-size: 16px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        /* Den gula matchningsrutan för inmatning */
+        .macro-box { 
+            background: #fff9db; 
+            border: 1px solid #ffe3e3; 
+            padding: 20px; 
+            border-radius: 4px; 
+            margin-bottom: 25px; 
+            border-left: 4px solid #fab005;
+        }
         
-        .toast { display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #28a745; color: white; padding: 12px 30px; border-radius: 4px; font-weight: bold; z-index: 1000; }
-        .preview-area { background: #f8f9fa; padding: 15px; border-radius: 4px; margin-bottom: 20px; font-family: monospace; font-size: 14px; white-space: pre-wrap; display: none; border-left: 5px solid #d9534f; }
+        .macro-box label { 
+            font-weight: 600; 
+            display: block; 
+            margin-bottom: 10px; 
+            color: #92531e; 
+            font-size: 14px;
+        }
         
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; opacity: 0.8; }
-        .team { background: #fafafa; border: 1px solid #ddd; padding: 15px; border-radius: 4px; }
-        .team h3 { margin-top: 0; border-bottom: 2px solid #333; padding-bottom: 5px; }
+        .macro-box input { 
+            width: 100%; 
+            padding: 14px; 
+            font-size: 18px; 
+            border: 1px solid #ced4da; 
+            border-radius: 4px; 
+            box-sizing: border-box; 
+            font-weight: 500;
+            color: #1a1a1a;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+        }
+        
+        .macro-box input:focus {
+            outline: none;
+            border-color: #fab005;
+            box-shadow: 0 0 0 3px rgba(250, 176, 5, 0.25);
+        }
+        
+        /* Notifikationsruta */
+        .toast { 
+            display: none; 
+            position: fixed; 
+            bottom: 30px; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            background: #2b8a3e; 
+            color: white; 
+            padding: 14px 35px; 
+            border-radius: 4px; 
+            font-weight: 600; 
+            font-size: 15px;
+            z-index: 1000; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        /* Förhandsgranskning i sann TT-wire-stil */
+        .preview-area { 
+            background: #222222; 
+            color: #f8f9fa;
+            padding: 20px; 
+            border-radius: 4px; 
+            margin-bottom: 25px; 
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace; 
+            font-size: 14px; 
+            line-height: 1.6;
+            white-space: pre-wrap; 
+            display: none; 
+            border-left: 5px solid #d9381e; 
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        /* Spelarlistor */
+        .grid { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 25px; 
+        }
+        
+        .team { 
+            background: #ffffff; 
+            border: 1px solid #e5e5e5; 
+            padding: 20px; 
+            border-radius: 4px; 
+        }
+        
+        .team h3 { 
+            margin-top: 0; 
+            font-size: 16px;
+            font-weight: 700;
+            color: #1a1a1a;
+            border-bottom: 2px solid #1a1a1a; 
+            padding-bottom: 8px; 
+            margin-bottom: 15px;
+        }
+        
+        .player-list {
+            display: grid; 
+            grid-template-columns: repeat(2, 1fr); 
+            font-size: 13px; 
+            gap: 6px;
+            color: #495057;
+        }
+        
+        .player-item {
+            padding: 3px 0;
+            border-bottom: 1px dashed #f1f3f5;
+        }
+        
+        .player-item b {
+            color: #d9381e; /* Gör tröjnumret rött för snabbare överblick */
+            margin-right: 4px;
+        }
     </style>
     
     <script>
@@ -49,7 +266,6 @@
             let cmdLag2 = document.getElementById('cmd-lag2').value.toLowerCase();
             let brodtextMall = document.getElementById('meta-mall').value;
             
-            // Matchar bokstav + siffra + mellanslag + resten av din text
             let regex = /^([a-zA-ZöÖäÄåÅ])(\d+)\s(.*)/;
             let match = val.match(regex);
             
@@ -62,14 +278,14 @@
                 let lag2 = matchData.teams[1];
                 
                 let sökLag = null;
-                let lagKortnamn = "";
+                let råttLagnamn = "";
                 
                 if (inskrivenBokstav === cmdLag1) {
                     sökLag = lag1;
-                    lagKortnamn = `${lag1.name}:s`;
+                    råttLagnamn = lag1.name;
                 } else if (inskrivenBokstav === cmdLag2) {
                     sökLag = lag2;
-                    lagKortnamn = `${lag2.name}:s`;
+                    råttLagnamn = lag2.name;
                 }
                 
                 if (sökLag) {
@@ -78,7 +294,17 @@
                     if (spelare) {
                         let spelarNamn = `${spelare.firstName} ${spelare.lastName}`;
                         
-                        // Sätt ihop enbart Spelarnamn + det du skrev + det som står i mallrutan
+                        // S-LOGIKEN: Om laget slutar på s (t.ex. Västerås), lägg inte på ett extra s
+                        let lagKortnamn = "";
+                        if (råttLagnamn.toLowerCase().endsWith('s')) {
+                            lagKortnamn = råttLagnamn; // Blir t.ex. "Västerås" eller "Örgryte IS" (om ni har kvar IS)
+                        } else {
+                            lagKortnamn = `${råttLagnamn}s`; // Blir t.ex. "AIKs" eller "Helsingborgs"
+                        }
+                        
+                        // Snygga till specialfall som "IFK Göteborgs" eller "Malmö FFs" om det behövs, 
+                        // men nu följer det ren svensk grammatik utan fula kolon!
+                        
                         let bildtext = `${lagKortnamn} ${spelarNamn} ${restenAvTexten.trim()} ${brodtextMall.trim()}`;
                         
                         globalGenereradText = bildtext;
@@ -117,11 +343,14 @@
     <div id="toast" class="toast">Kopierat!</div>
 
     <div class="wrapper">
-        <h1>TT Media Manager — Bildtextgenerator</h1>
+        <div class="header-container">
+            <h1>TT <span>Nyhetsbyrån</span> — Bildtextverktyg</h1>
+            <div class="badge-internal">Internt bruk</div>
+        </div>
         
         {% if data %}
             <div class="setup-grid">
-                <div class="setup-section" style="border-right: 1px solid #ccc; padding-right: 20px;">
+                <div class="setup-section" style="border-right: 1px solid #dee2e6; padding-right: 20px;">
                     <h3>Kortkommandon</h3>
                     <div class="shortcut-group">
                         <input type="text" id="cmd-lag1" maxlength="1" value="Ö">
@@ -140,8 +369,8 @@
             </div>
 
             <div class="macro-box">
-                <label for="macro-input">Skriv kod (t.ex. <span style="font-family: monospace;">G6 jublar efter 1-0</span>) och tryck Enter:</label>
-                <input type="text" id="macro-input" oninput="processMacro(this)" onkeypress="hanteraKeypress(event)" placeholder="Skriv här..." autofocus>
+                <label for="macro-input">Skriv kod (t.ex. <span style="font-family: monospace; background: rgba(0,0,0,0.05); padding: 2px 4px; border-radius: 3px;">G6 jublar efter 1-0</span>) och tryck Enter:</label>
+                <input type="text" id="macro-input" oninput="processMacro(this)" onkeypress="hanteraKeypress(event)" placeholder="Skriv din snabbkod här..." autofocus>
             </div>
 
             <div id="preview" class="preview-area"></div>
@@ -150,9 +379,9 @@
                 {% for team in data.teams %}
                     <div class="team">
                         <h3>{{ team.name }}</h3>
-                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); font-size: 13px; gap: 4px;">
+                        <div class="player-list">
                             {% for p in team.startelva %}
-                                <div><b>#{{ p.number }}</b> {{ p.firstName }} {{ p.lastName }}</div>
+                                <div class="player-item"><b>#{{ p.number }}</b> {{ p.firstName }} {{ p.lastName }}</div>
                             {% endfor %}
                         </div>
                     </div>
