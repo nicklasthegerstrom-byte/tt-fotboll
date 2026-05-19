@@ -2,12 +2,39 @@
 
 # Ordlista för TT:s standardförkortningar på klubbar (fyll på här efter hand)
 KLUBB_REPLACEMENTS = {
-    "Laholms FK": "Laholms",
-    "Rosengård": "Rosengårds",
-    "Djurgården": "Djurgårdens",
-    "Malmö FF": "Malmös",
-    "AIK": "AIKs",
-    "Hammarby": "Hammarbys"  # Bara som exempel!
+    # --- HERRAR: ALLSVENSKAN ---
+    "AIK Fotboll": "AIK",
+    "BK Häcken": "Häcken",
+    "Degerfors IF": "Degerfors",
+    "Djurgårdens IF Fotboll": "Djurgården",
+    "GAIS": "Gais",
+    "Halmstads BK": "Halmstad",
+    "Hammarby Fotboll": "Hammarby",
+    "IF Brommapojkarna": "Brommapojkarna",
+    "IF Elfsborg": "Elfsborg",
+    "IFK Göteborg": "IFK Göteborg",
+    "IK Sirius Fotboll": "Sirius",
+    "Kalmar FF": "Kalmar",
+    "Malmö FF": "Malmö FF",
+    "Mjällby AIF": "Mjällby",
+    "Västerås SK Fotboll": "Västerås",
+    "Örgryte IS": "Örgryte",
+
+    # --- DAMER: DAMALLSVENSKAN ---
+    "AIK": "AIK", 
+    "BK Häcken FF": "Häcken",
+    "Djurgården": "Djurgården",
+    "FC Rosengård": "Rosengård",
+    "Hammarby IF": "Hammarby",
+    "IFK Norrköping DFK": "Norrköping",
+    "KIF Örebro DFF": "Örebro",
+    "Kristianstads DFF": "Kristianstad",
+    "Linköping FC": "Linköping",
+    "Piteå IF DFF": "Piteå",
+    "Vittsjö GIK": "Vittsjö",
+    "Växjö DFF": "Växjö",
+    "Trelleborgs FF": "Trelleborg",
+    "Alingsås IF Fotboll": "Alingsås"
 }
 
 def process_match_data(raw_data):
