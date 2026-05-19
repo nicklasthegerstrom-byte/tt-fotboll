@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <title>TT Fotboll — Testvy</title>
+    <style>
+        body { font-family: sans-serif; background: #f4f6f8; padding: 40px; }
+        .box { max-width: 800px; margin: 0 auto; background: white; padding: 25px; border-radius: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        h1 { color: #d9534f; }
+        .team { margin-top: 20px; padding: 15px; background: #fafafa; border: 1px solid #ddd; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h1>TT Fotbolls-app: Mottagningstest</h1>
+        
+        {% if data %}
+            <h2>Match-ID: {{ data.matchId }}</h2>
+            <p style="color: green; font-weight: bold;">✓ Matchdata laddades in utan filuppladdning!</p>
+            
+            {% for team in data.teams %}
+                <div class="team">
+                    <h3>{{ team.name }}</h3>
+                    <ul>
+                        {% for p in team.startelva %}
+                            <li>#{{ p.number }} {{ p.firstName }} {{ p.lastName }} (Mål: {{ p.goals }}, Assist: {{ p.assists }})</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>Ingen match laddad ännu. Gå till svenskfotboll.se och klicka på ditt bokmärke!</p>
+        {% endif %}
+    </div>
+</body>
+</html>
