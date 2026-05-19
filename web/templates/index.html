@@ -369,7 +369,7 @@
                     <rect x="61" y="48" width="8" height="20" rx="4" fill="#111111" />
                 </svg>
             </div>
-            <div class="tt-title">Nyhetsbyrån — <span>Bildtextverktyg</span></div>
+            <div class="tt-title">Nyhetsbyrån — <span>Bildtextverktyg för fotboll</span></div>
         </div>
         <div class="badge-internal">Produktion</div>
     </div>
@@ -423,27 +423,12 @@
                 <h2 class="page-header">Installera Verktyget</h2>
                 <p style="color: #444; font-size: 15px; margin-bottom: 25px;">
                     Dra den gula knappen nedan till ditt bokmärkesfält (fältet under adressraden i din webbläsare). 
-                    Gå sedan till en matchrapport på svenskfotboll.se och klicka på bokmärket för att ladda in matchen!
+                    Gå sedan till matchen på svenskfotboll.se och klicka på bokmärket för att skrapa laguppställningen!
                 </p>
                 
-                <a href="javascript:(function(){
-                    const matchId = window.location.href.match(/matchfakta\/.*\/(\d+)/)?.[1];
-                    if(!matchId){ alert('Gå till en matchfaktasida på svenskfotboll.se först!'); return; }
-                    
-                    fetch(`https://api.svenskfotboll.se/public/v1/matches/${matchId}/lineups`)
-                    .then(r => r.json())
-                    .then(data => {
-                        fetch('https://tt-fotboll-production.up.railway.app/api/match', {
-                            method: 'POST',
-                            headers: {'Content-Type': 'application/json'},
-                            body: JSON.stringify(data)
-                        })
-                        .then(() => { window.location.href = 'https://tt-fotboll-production.up.railway.app/'; })
-                        .catch(() => alert('Kunde inte skicka datan till Railway.'));
-                    });
-                })();" 
+                <a href="javascript:(async()=>{const m=location.href.match(/(\d{7})/);if(!m)return alert('Kunde inte hitta match-ID');const id=m[1];const url=`https://c01.fogis.se/fogistemplates.se/livescore/xml/lineup-${id}.xml`;try{const r=await fetch(url);const xmlText=await r.text();const xml=new DOMParser().parseFromString(xmlText,'text/xml');const data=[...xml.querySelectorAll('team')].map(team=>({team:team.getAttribute('name'),players:[...team.querySelectorAll('player')].map(p=>({id:p.getAttribute('id'),firstName:p.getAttribute('given-name'),lastName:p.getAttribute('surname'),number:p.getAttribute('number'),captain:p.getAttribute('is-captain')==='true',goalkeeper:p.getAttribute('is-goalkeeper')==='true',goals:Number(p.getAttribute('goals')),assists:Number(p.getAttribute('assists')),image:p.getAttribute('image')}))}));const form=document.createElement('form');form.method='POST';form.action='https://tt-fotboll-production.up.railway.app/api/match';const input=document.createElement('input');input.type='hidden';input.name='match_data';input.value=JSON.stringify(data);form.appendChild(input);document.body.appendChild(form);form.submit()}catch(e){console.error(e);alert('Kunde inte exportera laguppställning')}})();" 
                 class="tt-search-btn" 
-                style="display: inline-flex; text-decoration: none; padding: 15px 30px; border-radius: 4px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+                style="display: inline-flex; text-decoration: none; padding: 15px 30px; border-radius: 4px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); color: #111111;">
                     + TT Bildtext-Skraparn
                 </a>
             </div>
