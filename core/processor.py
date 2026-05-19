@@ -42,8 +42,13 @@ def process_match_data(raw_data):
     Tar emot rå JSON från bokmärket, städar lagnamnen,
     och separerar spelarna i startelva och avbytare.
     """
-    match_id = raw_data.get("matchId", "Okänt ID")
-    raw_teams = raw_data.get("teams", [])
+    # FIX: Kolla om datan kommer som en ren lista (från XML-bokmärket) eller som ett objekt
+    if isinstance(raw_data, list):
+        raw_teams = raw_data
+        match_id = "Okänt ID"
+    else:
+        match_id = raw_data.get("matchId", "Okänt ID")
+        raw_teams = raw_data.get("teams", [])
     
     cleaned_teams = []
     
@@ -61,10 +66,6 @@ def process_match_data(raw_data):
         
         # Gå igenom alla spelare i laget
         for player in team.get("players", []):
-            # En spelare är avbytare om "image" saknas eller om ni vill styra 
-            # baserat på SvFF:s dolda logik (i din JSON är alla samlade i en lista).
-            # SvFF:s XML sätter oftast de 11 första som startelva, eller använder positions-attribut.
-            # För tillfället lägger vi alla i startelvan så fixar vi sorteringen sen!
             team_obj["startelva"].append({
                 "id": player.get("id"),
                 "number": player.get("number"),
@@ -76,7 +77,7 @@ def process_match_data(raw_data):
                 "assists": player.get("assists", 0)
             })
             
-        cleaned_teams.append(team_box := team_obj)
+        cleaned_teams.append(team_obj)
         
     return {
         "matchId": match_id,
