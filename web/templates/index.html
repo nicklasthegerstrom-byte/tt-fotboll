@@ -2,18 +2,20 @@
 <html lang="sv">
 <head>
     <meta charset="UTF-8">
-    <title>TT Media Manager — Bildtextgenerator</title>
+    <title>TT Media Manager — Bildtext-ihopslagning</title>
     <style>
         body { font-family: -apple-system, sans-serif; background: #f0f2f5; padding: 20px; color: #1a1a1a; }
         .wrapper { max-width: 1000px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.06); }
         h1 { color: #d9534f; margin-top: 0; font-size: 22px; text-transform: uppercase; border-bottom: 2px solid #eee; padding-bottom: 10px; }
         
-        /* Inställningar för kortkommandon */
-        .shortcut-settings { display: flex; gap: 20px; background: #e9ecef; padding: 15px; border-radius: 6px; margin-bottom: 20px; }
-        .shortcut-group { display: flex; align-items: center; gap: 10px; }
+        .setup-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 20px; background: #e9ecef; padding: 20px; border-radius: 6px; margin-bottom: 20px; }
+        .setup-section h3 { margin-top: 0; margin-bottom: 10px; font-size: 14px; text-transform: uppercase; color: #495057; }
+        .shortcut-group { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
         .shortcut-group input { width: 40px; padding: 6px; font-size: 16px; text-align: center; font-weight: bold; text-transform: uppercase; border: 1px solid #ccc; border-radius: 4px; }
         
-        /* Huvudrutan för bildtexten */
+        .input-field { width: 100%; padding: 8px; font-size: 14px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        textarea.input-field { height: 60px; font-family: sans-serif; resize: vertical; }
+
         .macro-box { background: #fff3cd; border: 1px solid #ffeeba; padding: 20px; border-radius: 6px; margin-bottom: 25px; }
         .macro-box label { font-weight: bold; display: block; margin-bottom: 8px; color: #856404; }
         .macro-box input { width: 100%; padding: 12px; font-size: 16px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
@@ -27,10 +29,7 @@
     </style>
     
     <script>
-        // Sparar lagdatan från backend
-       
         const matchData = JSON.parse('{{ data|tojson|safe if data else "null" }}');
-        const meta = JSON.parse('{{ meta|tojson|safe if meta else "{}" }}');
 
         function visaToast(text) {
             let t = document.getElementById('toast');
@@ -39,7 +38,6 @@
             setTimeout(() => { t.style.display = 'none'; }, 2000);
         }
 
-        // Variabel för att spara den genererade texten
         let globalGenereradText = "";
 
         function processMacro(inputElement) {
@@ -49,8 +47,9 @@
             
             let cmdLag1 = document.getElementById('cmd-lag1').value.toLowerCase();
             let cmdLag2 = document.getElementById('cmd-lag2').value.toLowerCase();
+            let brodtextMall = document.getElementById('meta-mall').value;
             
-            // Matchar t.ex. G6, Ö44, g14 följt av ett mellanslag och resten av texten
+            // Matchar bokstav + siffra + mellanslag + resten av din text
             let regex = /^([a-zA-ZöÖäÄåÅ])(\d+)\s(.*)/;
             let match = val.match(regex);
             
@@ -74,16 +73,13 @@
                 }
                 
                 if (sökLag) {
-                    // Leta efter spelaren i det valda laget
                     let spelare = sökLag.startelva.find(p => p.number == tröjnummer);
                     
                     if (spelare) {
                         let spelarNamn = `${spelare.firstName} ${spelare.lastName}`;
                         
-                        // Bygg ihop hela TT-paketet
-                        let bildtext = `${meta.ort_datum}\n`;
-                        bildtext += `${lagKortnamn} ${spelarNamn} ${restenAvTexten} under fotbollsmatchen i ${meta.serienamn} mellan ${lag1.name} och ${lag2.name} på ${meta.arena}. ${meta.extratext}\n`;
-                        bildtext += `Foto: ${meta.fotograf} / ${meta.kod}`;
+                        // Sätt ihop enbart Spelarnamn + det du skrev + det som står i mallrutan
+                        let bildtext = `${lagKortnamn} ${spelarNamn} ${restenAvTexten.trim()} ${brodtextMall.trim()}`;
                         
                         globalGenereradText = bildtext;
                         let preview = document.getElementById('preview');
@@ -94,28 +90,23 @@
                 }
             }
             
-            // Om texten inte matchar ett kommando ännu, rensa förhandsgranskningen
             document.getElementById('preview').style.display = 'none';
             globalGenereradText = "";
         }
 
-        // KORRIGERAD: Denna funktion fångar upp Enter-trycket ordentligt
         function hanteraKeypress(event) {
             if (event.key === 'Enter') {
-                // Hindra att sidan gör något annat (t.ex. laddar om)
                 event.preventDefault(); 
                 
                 if (globalGenereradText) {
-                    // Kopiera till urklipp
                     navigator.clipboard.writeText(globalGenereradText);
                     visaToast("✓ Bildtext kopierad till urklipp!");
                     
-                    // Töm fältet direkt så redaktören kan skriva nästa bild
                     document.getElementById('macro-input').value = '';
                     document.getElementById('preview').style.display = 'none';
                     globalGenereradText = "";
                 } else {
-                    visaToast("⚠️ Skriv en giltig kod först (t.ex. G14...)");
+                    visaToast("⚠️ Skriv en giltig kod först (t.ex. G6...)");
                 }
             }
         }
@@ -129,20 +120,28 @@
         <h1>TT Media Manager — Bildtextgenerator</h1>
         
         {% if data %}
-            <div class="shortcut-settings">
-                <div class="shortcut-group">
-                    <label for="cmd-lag1">Kortkommando för <b>{{ data.teams[0].name }}</b>:</label>
-                    <input type="text" id="cmd-lag1" maxlength="1" value="Ö">
+            <div class="setup-grid">
+                <div class="setup-section" style="border-right: 1px solid #ccc; padding-right: 20px;">
+                    <h3>Kortkommandon</h3>
+                    <div class="shortcut-group">
+                        <input type="text" id="cmd-lag1" maxlength="1" value="Ö">
+                        <label for="cmd-lag1">{{ data.teams[0].name }}</label>
+                    </div>
+                    <div class="shortcut-group">
+                        <input type="text" id="cmd-lag2" maxlength="1" value="G">
+                        <label for="cmd-lag2">{{ data.teams[1].name }}</label>
+                    </div>
                 </div>
-                <div class="shortcut-group">
-                    <label for="cmd-lag2">Kortkommando för <b>{{ data.teams[1].name }}</b>:</label>
-                    <input type="text" id="cmd-lag2" maxlength="1" value="G">
+                
+                <div class="setup-section">
+                    <h3>Mallruta (Texten som hängs på i slutet)</h3>
+                    <textarea id="meta-mall" class="input-field">under tisdagens fotbollsmatch i allsvenskan mellan {{ data.teams[0].name }} och {{ data.teams[1].name }} på Gamla Ullevi.</textarea>
                 </div>
             </div>
 
             <div class="macro-box">
-                <label for="macro-input">Skriv snabbkod (t.ex. <span style="font-family: monospace;">G6 jublar efter 1-0</span>) och tryck Enter:</label>
-                <input type="text" id="macro-input" oninput="processMacro(this)" onkeypress="hanteraKeypress(event)" placeholder="Skriv här... tryck Enter för att kopiera och rensa" autofocus>
+                <label for="macro-input">Skriv kod (t.ex. <span style="font-family: monospace;">G6 jublar efter 1-0</span>) och tryck Enter:</label>
+                <input type="text" id="macro-input" oninput="processMacro(this)" onkeypress="hanteraKeypress(event)" placeholder="Skriv här..." autofocus>
             </div>
 
             <div id="preview" class="preview-area"></div>
