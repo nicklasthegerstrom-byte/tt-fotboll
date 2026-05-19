@@ -2,7 +2,7 @@
 <html lang="sv">
 <head>
     <meta charset="UTF-8">
-    <title>TT Nyhetsbyrån — Bildtextgenerator</title>
+    <title>TT Nyhetsbyrån — Bildtextgenerator för fotboll</title>
     <style>
         /* TT Nyhetsbyrån Global Identity Styles */
         body { 
@@ -31,19 +31,13 @@
             gap: 15px;
         }
 
-        /* TT-loggan (den vita cirkeln till vänster) */
-        .tt-logo-circle {
-            width: 32px;
-            height: 32px;
-            background: #ffffff;
-            color: #111111;
-            border-radius: 50%;
+        /* Container för SVG-loggan */
+        .tt-logo-container {
+            width: 35px;
+            height: 35px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: 900;
-            font-size: 16px;
-            letter-spacing: -1px;
         }
 
         .tt-title {
@@ -208,7 +202,7 @@
             border-left: 4px solid #fed100; 
         }
 
-        /* Laguppställningar i stilrena boxar */
+        /* Laguppställningar */
         .grid { 
             display: grid; 
             grid-template-columns: 1fr 1fr; 
@@ -366,7 +360,15 @@
 
     <div class="tt-top-bar">
         <div class="tt-brand">
-            <div class="tt-logo-circle">tt</div>
+            <div class="tt-logo-container">
+                <svg viewBox="0 0 100 100" width="100%" height="100%">
+                    <circle cx="50" cy="50" r="50" fill="white" />
+                    <rect x="26" y="36" width="18" height="8" rx="4" fill="#111111" />
+                    <rect x="31" y="48" width="8" height="20" rx="4" fill="#111111" />
+                    <rect x="56" y="36" width="18" height="8" rx="4" fill="#111111" />
+                    <rect x="61" y="48" width="8" height="20" rx="4" fill="#111111" />
+                </svg>
+            </div>
             <div class="tt-title">Nyhetsbyrån — <span>Bildtextverktyg</span></div>
         </div>
         <div class="badge-internal">Produktion</div>
