@@ -18,7 +18,7 @@ KLUBB_REPLACEMENTS = {
     "Malmö FF": "Malmö FF",
     "Mjällby AIF": "Mjällby",
     "Västerås SK Fotboll": "Västerås",
-    "Örgryte IS": "Örgryte",
+    "Örgryte IS Fotboll": "Örgryte",
 
     # --- DAMER: DAMALLSVENSKAN ---
     "AIK": "AIK", 
