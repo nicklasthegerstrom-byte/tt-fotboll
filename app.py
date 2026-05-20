@@ -5,6 +5,9 @@ from web.routes import web_bp
 def create_app():
     app = Flask(__name__)
     
+    # Kryptering för sessions så att redaktionen kan köra olika matcher samtidigt
+    app.secret_key = 'tt-redaktionen-super-hemlig-kod-2026'
+    
     # Registrera vår Blueprint som innehåller alla dörrar/rutter
     app.register_blueprint(web_bp)
     
