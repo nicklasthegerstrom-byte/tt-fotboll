@@ -313,6 +313,7 @@
                     if (spelare) {
                         let spelarNamn = `${spelare.firstName} ${spelare.lastName}`;
                         
+                        // S-LOGIK för laget
                         let lagKortnamn = "";
                         if (råttLagnamn.toLowerCase().endsWith('s')) {
                             lagKortnamn = råttLagnamn;
@@ -320,7 +321,12 @@
                             lagKortnamn = `${råttLagnamn}s`;
                         }
                         
-                        return `${lagKortnamn} ${spelarNamn}`;
+                        // MÅLVAKTS-LOGIK: Om spelaren är märkt som målvakt, skjut in "målvakt" i texten
+                        if (spelare.goalkeeper) {
+                            return `${lagKortnamn} målvakt ${spelarNamn}`;
+                        } else {
+                            return `${lagKortnamn} ${spelarNamn}`;
+                        }
                     }
                 }
                 return match;
