@@ -20,6 +20,7 @@ KLUBB_REPLACEMENTS = {
     "Västerås SK Fotboll": "Västerås",
     "Västerås SK FK": "Västerås",
     "Örgryte IS Fotboll": "Örgryte",
+    "Örgryte IS": "Örgryte",
 
     # --- DAMER: DAMALLSVENSKAN ---
     "AIK": "AIK", 
@@ -28,6 +29,7 @@ KLUBB_REPLACEMENTS = {
     "FC Rosengård": "Rosengård",
     "Hammarby IF": "Hammarby",
     "IFK Norrköping DFK": "Norrköping",
+    "IK Uppsala": "IK Uppsala",
     "KIF Örebro DFF": "Örebro",
     "Kristianstads DFF": "Kristianstad",
     "Linköping FC": "Linköping",

@@ -2,444 +2,254 @@
 <html lang="sv">
 <head>
     <meta charset="UTF-8">
-    <title>TT Nyhetsbyrån — Bildtextgenerator för fotboll</title>
+    <title>TT Bildtext-Skraparn</title>
     <style>
-        /* TT Nyhetsbyrån Global Identity Styles */
-        body { 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
-            background: #ffffff; 
-            margin: 0;
-            padding: 0; 
-            color: #1a1a1a; 
-            line-height: 1.5;
-        }
-
-        /* Den mörka toppbaren från skärmbilden */
-        .tt-top-bar {
-            background: #111111;
-            color: #ffffff;
-            padding: 12px 30px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-
-        .tt-brand {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        /* Container för SVG-loggan */
-        .tt-logo-container {
-            width: 35px;
-            height: 35px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .tt-title {
-            font-size: 16px;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-        }
-
-        .tt-title span {
-            color: #fed100; /* TT-gult */
-        }
-
-        .badge-internal {
-            font-size: 11px;
-            font-weight: 600;
-            color: #aaaaaa;
-            border: 1px solid #444444;
-            padding: 3px 8px;
-            border-radius: 3px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        /* Tvåspaltslayout: Sidomeny + Huvudinnehåll */
-        .tt-layout {
-            display: flex;
-            min-height: calc(100vh - 56px);
-        }
-
-        /* Vänster sidomeny (Inställningar) */
-        .tt-sidebar {
-            width: 280px;
-            background: #f8f9fa;
-            border-right: 1px solid #e5e5e5;
-            padding: 30px 20px;
-            box-sizing: border-box;
-        }
-
-        .sidebar-section h3 {
-            margin-top: 0;
-            margin-bottom: 20px;
-            font-size: 12px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: #6c757d;
-            border-bottom: 1px solid #e5e5e5;
-            padding-bottom: 5px;
-        }
-
-        .shortcut-group { 
-            display: flex; 
-            align-items: center; 
-            gap: 12px; 
-            margin-bottom: 15px; 
-        }
-        
-        .shortcut-group input { 
-            width: 45px; 
-            padding: 8px; 
-            font-size: 14px; 
-            text-align: center; 
-            font-weight: bold; 
-            text-transform: uppercase; 
-            border: 1px solid #ced4da; 
-            border-radius: 3px;
-        }
-
-        .shortcut-group label {
-            font-size: 13px;
-            font-weight: 600;
-            color: #333333;
-        }
-
-        .input-field { 
-            width: 100%; 
-            padding: 10px; 
-            font-size: 13px; 
-            border: 1px solid #ced4da; 
-            border-radius: 3px; 
-            box-sizing: border-box; 
-            background: #ffffff;
-            font-family: inherit;
-        }
-
-        textarea.input-field {
-            height: 120px;
-            resize: none;
-            line-height: 1.4;
-        }
-
-        /* Huvudområdet till höger */
-        .tt-main-content {
-            flex: 1;
-            padding: 40px;
-            max-width: 900px;
-            box-sizing: border-box;
-        }
-
-        .page-header {
-            font-size: 32px;
-            font-weight: 300;
-            letter-spacing: -0.5px;
-            margin-top: 0;
-            margin-bottom: 30px;
-            text-transform: uppercase;
-        }
-
-        /* Makrorutan stylad exakt som TT:s sökfält */
-        .tt-search-container {
-            display: flex;
-            margin-bottom: 25px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-            border-radius: 4px;
-            overflow: hidden;
-            border: 1px solid #ced4da;
-        }
-
-        .tt-search-container input {
-            flex: 1;
-            padding: 16px 20px;
-            font-size: 16px;
-            border: none;
-            outline: none;
-            font-weight: 400;
-        }
-
-        /* Den klargula TT-knappen från bilden */
-        .tt-search-btn {
-            background: #fed100;
-            color: #111111;
-            border: none;
-            padding: 0 30px;
-            font-weight: 700;
-            font-size: 14px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            transition: background 0.1s ease;
-        }
-
-        .tt-search-btn:hover {
-            background: #e5bd00;
-        }
-
-        /* Förhandsgranskning (TT-wire-stil) */
-        .preview-area { 
-            background: #111111; 
-            color: #f8f9fa;
-            padding: 20px; 
-            border-radius: 4px; 
-            margin-bottom: 35px; 
-            font-family: "SFMono-Regular", Consolas, monospace; 
-            font-size: 14px; 
-            line-height: 1.6;
-            white-space: pre-wrap; 
-            display: none; 
-            border-left: 4px solid #fed100; 
-        }
-
-        /* Laguppställningar */
-        .grid { 
-            display: grid; 
-            grid-template-columns: 1fr 1fr; 
-            gap: 30px; 
-        }
-        
-        .team h4 { 
-            margin-top: 0; 
-            font-size: 14px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: #111111;
-            border-bottom: 2px solid #111111; 
-            padding-bottom: 6px; 
-            margin-bottom: 15px;
-        }
-        
-        .player-list {
-            display: grid; 
-            grid-template-columns: repeat(2, 1fr); 
-            font-size: 13px; 
-            gap: 6px;
-            color: #444444;
-        }
-        
-        .player-item {
-            padding: 4px 6px;
-            background: #f8f9fa;
-            border-radius: 3px;
-            border: 1px solid #e5e5e5;
-        }
-        
-        .player-item b {
-            color: #111111;
-            background: #e5e5e5;
-            padding: 1px 4px;
-            border-radius: 2px;
-            margin-right: 6px;
-            font-size: 11px;
-        }
-
-        /* Notifikationsruta */
-        .toast { 
-            display: none; 
-            position: fixed; 
-            bottom: 30px; 
-            left: 50%; 
-            transform: translateX(-50%); 
-            background: #111111; 
-            color: #fed100; 
-            padding: 14px 35px; 
-            border-radius: 4px; 
-            font-weight: 600; 
-            font-size: 14px;
-            z-index: 1000; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            border: 1px solid #444444;
-        }
+        /* Er snygga TT-layout med gult och svart */
+        body { font-family: Arial, sans-serif; background: #f4f4f4; margin: 0; padding: 20px; color: #333; }
+        .tt-container { max-width: 900px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .tt-header { display: flex; align-items: center; justify-content: space-between; border-bottom: 3px solid #fed100; padding-bottom: 15px; margin-bottom: 25px; }
+        .tt-logo { font-size: 24px; font-weight: bold; background: #111; color: #fed100; padding: 8px 15px; border-radius: 4px; text-transform: uppercase; letter-spacing: 1px; }
+        .page-header { margin: 0; font-size: 22px; color: #111; }
+        .tt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 25px; }
+        .tt-card { background: #fafafa; border: 1px solid #e0e0e0; border-radius: 6px; padding: 15px; }
+        .tt-card h3 { margin-top: 0; border-bottom: 1px solid #fed100; padding-bottom: 5px; color: #111; }
+        .player-row { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px dashed #eee; font-size: 14px; }
+        .player-num { font-weight: bold; color: #666; width: 25px; }
+        .player-name { flex-grow: 1; }
+        .tt-search-container { display: flex; gap: 10px; margin-bottom: 20px; }
+        #macro-input { flex-grow: 1; padding: 12px; font-size: 16px; border: 2px solid #ccc; border-radius: 4px; }
+        #macro-input:focus { border-color: #fed100; outline: none; }
+        .tt-search-btn { background: #fed100; color: #111; border: none; padding: 12px 25px; font-size: 16px; font-weight: bold; border-radius: 4px; cursor: pointer; transition: background 0.2s; }
+        .tt-search-btn:hover { background: #e5bd00; }
+        #preview { background: #fffde7; border: 2px dashed #fed100; padding: 15px; border-radius: 6px; font-size: 16px; font-weight: bold; margin-bottom: 20px; display: none; line-height: 1.5; }
+        #toast { position: fixed; bottom: 20px; right: 20px; background: #2e7d32; color: white; padding: 12px 25px; border-radius: 4px; font-weight: bold; display: none; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        .config-row { display: flex; gap: 10px; margin-bottom: 15px; background: #eee; padding: 10px; border-radius: 4px; align-items: center; }
+        .config-row input { width: 50px; padding: 5px; text-align: center; font-weight: bold; }
     </style>
-    
-    <script>
-        const matchData = JSON.parse('{{ data|tojson|safe if data else "null" }}');
-
-        function visaToast(text) {
-            let t = document.getElementById('toast');
-            t.innerText = text;
-            t.style.display = 'block';
-            setTimeout(() => { t.style.display = 'none'; }, 2000);
-        }
-
-        let globalGenereradText = "";
-
-        function processMacro(inputElement) {
-            if (!matchData || matchData.teams.length < 2) return;
-            
-            let val = inputElement.value;
-            if (!val.trim()) {
-                document.getElementById('preview').style.display = 'none';
-                globalGenereradText = "";
-                return;
-            }
-            
-            let cmdLag1 = document.getElementById('cmd-lag1').value.toLowerCase();
-            let cmdLag2 = document.getElementById('cmd-lag2').value.toLowerCase();
-            let brodtextMall = document.getElementById('meta-mall').value;
-            
-            let regex = /([a-zA-ZöÖäÄåÅ])(\d+)/g;
-            
-            let lag1 = matchData.teams[0];
-            let lag2 = matchData.teams[1];
-            
-            let transformeradText = val.replace(regex, (match, bokstav, nummer) => {
-                let inskrivenBokstav = bokstav.toLowerCase();
-                let sökLag = null;
-                let råttLagnamn = "";
-                
-                if (inskrivenBokstav === cmdLag1) {
-                    sökLag = lag1;
-                    råttLagnamn = lag1.name;
-                } else if (inskrivenBokstav === cmdLag2) {
-                    sökLag = lag2;
-                    råttLagnamn = lag2.name;
-                }
-                
-                if (sökLag) {
-                    let spelare = sökLag.startelva.find(p => p.number == nummer);
-                    if (spelare) {
-                        let spelarNamn = `${spelare.firstName} ${spelare.lastName}`;
-                        
-                        // S-LOGIK för laget
-                        let lagKortnamn = "";
-                        if (råttLagnamn.toLowerCase().endsWith('s')) {
-                            lagKortnamn = råttLagnamn;
-                        } else {
-                            lagKortnamn = `${råttLagnamn}s`;
-                        }
-                        
-                        // MÅLVAKTS-LOGIK: Om spelaren är märkt som målvakt, skjut in "målvakt" i texten
-                        if (spelare.goalkeeper) {
-                            return `${lagKortnamn} målvakt ${spelarNamn}`;
-                        } else {
-                            return `${lagKortnamn} ${spelarNamn}`;
-                        }
-                    }
-                }
-                return match;
-            });
-            
-            let bildtext = `${transformeradText.trim()} ${brodtextMall.trim()}`;
-            
-            globalGenereradText = bildtext;
-            let preview = document.getElementById('preview');
-            preview.innerText = bildtext;
-            preview.style.display = 'block';
-        }
-
-        function hanteraKeypress(event) {
-            if (event.key === 'Enter') {
-                event.preventDefault(); 
-                kopieraTillUrklipp();
-            }
-        }
-
-        function kopieraTillUrklipp() {
-            if (globalGenereradText) {
-                navigator.clipboard.writeText(globalGenereradText);
-                visaToast("✓ KOPIERAD TILL URKLIPP!");
-                document.getElementById('macro-input').value = '';
-                document.getElementById('preview').style.display = 'none';
-                globalGenereradText = "";
-            } else {
-                visaToast("⚠️ Skriv en giltig kod först");
-            }
-        }
-    </script>
 </head>
 <body>
 
-    <div id="toast" class="toast">KOPIERAT!</div>
+<div class="tt-container">
+    <div class="tt-header">
+        <div class="tt-logo">TT Nyhetsbyrå</div>
+        <div class="page-header">Bildtextverktyg Fotboll</div>
+    </div>
 
-    <div class="tt-top-bar">
-        <div class="tt-brand">
-            <div class="tt-logo-container">
-                <svg viewBox="0 0 100 100" width="100%" height="100%">
-                    <circle cx="50" cy="50" r="50" fill="white" />
-                    <rect x="26" y="36" width="18" height="8" rx="4" fill="#111111" />
-                    <rect x="31" y="48" width="8" height="20" rx="4" fill="#111111" />
-                    <rect x="56" y="36" width="18" height="8" rx="4" fill="#111111" />
-                    <rect x="61" y="48" width="8" height="20" rx="4" fill="#111111" />
-                </svg>
-            </div>
-            <div class="tt-title">Nyhetsbyrån — <span>Bildtextverktyg för fotboll</span></div>
+    {% if data %}
+        <div class="config-row">
+            <strong>Triggers för Espanso/Live-skrivning:</strong>
+            <label for="cmd-lag1">{{ data.teams[0].name }}:</label>
+            <input type="text" id="cmd-lag1" value="H" oninput="processMacro(document.getElementById('macro-input'))">
+            
+            <label for="cmd-lag2">{{ data.teams[1].name }}:</label>
+            <input type="text" id="cmd-lag2" value="A" oninput="processMacro(document.getElementById('macro-input'))">
+            
+            <span style="margin-left: auto;">Brödtext-mall:</span>
+            <input type="text" id="meta-mall" value="under matchen i allsvenskan på lördagen." style="width: 250px; text-align: left;">
         </div>
-        <div class="badge-internal">Produktion</div>
-    </div>
-    
-    <div class="tt-layout">
-        {% if data %}
-            <div class="tt-sidebar">
-                <div class="sidebar-section">
-                    <h3>Kortkommandon</h3>
-                    <div class="shortcut-group">
-                        <input type="text" id="cmd-lag1" maxlength="1" value="Ö">
-                        <label for="cmd-lag1">{{ data.teams[0].name }}</label>
+
+        <div class="tt-search-container">
+            <input type="text" id="macro-input" oninput="processMacro(this)" onkeypress="hanteraKeypress(event)" placeholder="Skriv kod här (t.ex. H10 dribblar förbi A35)..." autofocus>
+            <button class="tt-search-btn" onclick="kopieraTillUrklipp()">Kopiera</button>
+            <button class="tt-search-btn" onclick="laddaNerEspanso()" style="background: #111111; color: #fed100; border-left: 1px solid #444444;">Exportera till Espanso</button>
+        </div>
+
+        <div id="preview"></div>
+
+        <div class="tt-grid">
+            <div class="tt-card">
+                <h3>{{ data.teams[0].name }} (Hemmalag)</h3>
+                {% for p in data.teams[0].startelva %}
+                    <div class="player-row">
+                        <span class="player-num">{{ p.number }}</span>
+                        <span class="player-name">{{ p.firstName }} {{ p.lastName }} {% if p.goalkeeper %}(MV){% endif %}{% if p.captain %}(C){% endif %}</span>
                     </div>
-                    <div class="shortcut-group">
-                        <input type="text" id="cmd-lag2" maxlength="1" value="G">
-                        <label for="cmd-lag2">{{ data.teams[1].name }}</label>
+                {% endfor %}
+            </div>
+            <div class="tt-card">
+                <h3>{{ data.teams[1].name }} (Bortalag)</h3>
+                {% for p in data.teams[1].startelva %}
+                    <div class="player-row">
+                        <span class="player-num">{{ p.number }}</span>
+                        <span class="player-name">{{ p.firstName }} {{ p.lastName }} {% if p.goalkeeper %}(MV){% endif %}{% if p.captain %}(C){% endif %}</span>
                     </div>
-                </div>
-                
-                <div class="sidebar-section" style="margin-top: 30px;">
-                    <h3>Automatisk sluttext</h3>
-                    <textarea id="meta-mall" class="input-field">under XX fotbollsmatch i allsvenskan mellan {{ data.teams[0].name }} och {{ data.teams[1].name }} på XX.</textarea>
-                </div>
+                {% endfor %}
             </div>
+        </div>
 
-            <div class="tt-main-content">
-                <h2 class="page-header">Generera Bildtext</h2>
+    {% else %}
+        <div class="tt-main-content" style="max-width: 100%;">
+            <h2 class="page-header">Installera Verktyget</h2>
+            <p style="color: #444; font-size: 15px; margin-bottom: 25px;">
+                Dra den gula knappen nedan till ditt bokmärkesfält (fältet under adressraden i din webbläsare). 
+                Gå sedan till matchen på svenskfotboll.se och klicka på bokmärket för att skrapa laguppställningen till en ny flik!
+            </p>
+            
+            <a href="javascript:(async()=>{const m=location.href.match(/(\d{7})/);if(!m)return alert('Kunde inte hitta match-ID');const id=m[1];const url=`https://c01.fogis.se/fogistemplates.se/livescore/xml/lineup-${id}.xml`;try{const r=await fetch(url);const xmlText=await r.text();const xml=new DOMParser().parseFromString(xmlText,'text/xml');const data=[...xml.querySelectorAll('team')].map(team=>({team:team.getAttribute('name'),players:[...team.querySelectorAll('player')].map(p=>({id:p.getAttribute('id'),firstName:p.getAttribute('given-name'),lastName:p.getAttribute('surname'),number:p.getAttribute('number'),captain:p.getAttribute('is-captain')==='true',goalkeeper:p.getAttribute('is-goalkeeper')==='true',goals:Number(p.getAttribute('goals')),assists:Number(p.getAttribute('assists')),image:p.getAttribute('image')}))}));const form=document.createElement('form');form.method='POST';form.action='https://tt-fotboll.onrender.com/api/match';form.target='_blank';const input=document.createElement('input');input.type='hidden';input.name='match_data';input.value=JSON.stringify(data);form.appendChild(input);document.body.appendChild(form);form.submit()}catch(e){console.error(e);alert('Kunde inte exportera laguppställning')}})();" 
+            class="tt-search-btn" 
+            style="display: inline-flex; text-decoration: none; padding: 15px 30px; border-radius: 4px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); color: #111111;">
+                + TT Bildtext-Skraparn
+            </a>
+        </div>
+    {% endif %}
+</div>
 
-                <div class="tt-search-container">
-                    <input type="text" id="macro-input" oninput="processMacro(this)" onkeypress="hanteraKeypress(event)" placeholder="Skriv kod här (t.ex. G15 dribblar förbi Ö44)..." autofocus>
-                    <button class="tt-search-btn" onclick="kopieraTillUrklipp()">Kopiera</button>
-                </div>
+<div id="toast"></div>
 
-                <div id="preview" class="preview-area"></div>
+<script>
+    const matchData = JSON.parse('{{ data|tojson|safe if data else "null" }}');
 
-                <div class="grid">
-                    {% for team in data.teams %}
-                        <div class="team">
-                            <h4>{{ team.name }}</h4>
-                            <div class="player-list">
-                                {% for p in team.startelva %}
-                                    <div class="player-item"><b>{{ p.number }}</b> {{ p.firstName }} {{ p.lastName }}</div>
-                                {% endfor %}
-                            </div>
-                        </div>
-                    {% endfor %}
-                </div>
-            </div>
-        {% else %}
-            <div class="tt-main-content" style="max-width: 100%;">
-                <h2 class="page-header">Installera Verktyget</h2>
-                <p style="color: #444; font-size: 15px; margin-bottom: 25px;">
-                    Dra den gula knappen nedan till ditt bokmärkesfält (fältet under adressraden i din webbläsare). 
-                    Gå sedan till matchen på svenskfotboll.se och klicka på bokmärket för att skrapa laguppställningen till en ny flik!
-                </p>
-                
-                <a href="javascript:(async()=>{const m=location.href.match(/(\d{7})/);if(!m)return alert('Kunde inte hitta match-ID');const id=m[1];const url=`https://c01.fogis.se/fogistemplates.se/livescore/xml/lineup-${id}.xml`;try{const r=await fetch(url);const xmlText=await r.text();const xml=new DOMParser().parseFromString(xmlText,'text/xml');const data=[...xml.querySelectorAll('team')].map(team=>({team:team.getAttribute('name'),players:[...team.querySelectorAll('player')].map(p=>({id:p.getAttribute('id'),firstName:p.getAttribute('given-name'),lastName:p.getAttribute('surname'),number:p.getAttribute('number'),captain:p.getAttribute('is-captain')==='true',goalkeeper:p.getAttribute('is-goalkeeper')==='true',goals:Number(p.getAttribute('goals')),assists:Number(p.getAttribute('assists')),image:p.getAttribute('image')}))}));const form=document.createElement('form');form.method='POST';form.action='https://tt-fotboll-production.up.railway.app/api/match';form.target='_blank';const input=document.createElement('input');input.type='hidden';input.name='match_data';input.value=JSON.stringify(data);form.appendChild(input);document.body.appendChild(form);form.submit()}catch(e){console.error(e);alert('Kunde inte exportera laguppställning')}})();" 
-                class="tt-search-btn" 
-                style="display: inline-flex; text-decoration: none; padding: 15px 30px; border-radius: 4px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); color: #111111;">
-                    + TT Bildtext-Skraparn
-                </a>
-            </div>
-        {% endif %}
-    </div>
+    function visaToast(text) {
+        let t = document.getElementById('toast');
+        t.innerText = text;
+        t.style.display = 'block';
+        setTimeout(() => { t.style.display = 'none'; }, 2000);
+    }
 
+    let globalGenereradText = "";
+
+    function processMacro(inputElement) {
+        if (!matchData || matchData.teams.length < 2) return;
+        
+        let val = inputElement.value;
+        if (!val.trim()) {
+            document.getElementById('preview').style.display = 'none';
+            globalGenereradText = "";
+            return;
+        }
+        
+        let cmdLag1 = document.getElementById('cmd-lag1').value.toLowerCase();
+        let cmdLag2 = document.getElementById('cmd-lag2').value.toLowerCase();
+        let brodtextMall = document.getElementById('meta-mall').value;
+        
+        let regex = /([a-zA-ZöÖäÄåÅ]+)(\d+)/g;
+        
+        let lag1 = matchData.teams[0];
+        let lag2 = matchData.teams[1];
+        
+        let transformeradText = val.replace(regex, (match, bokstav, nummer) => {
+            let inskrivenBokstav = bokstav.toLowerCase();
+            let sökLag = null;
+            let råttLagnamn = "";
+            
+            if (inskrivenBokstav === cmdLag1) {
+                sökLag = lag1;
+                råttLagnamn = lag1.name;
+            } else if (inskrivenBokstav === cmdLag2) {
+                sökLag = lag2;
+                råttLagnamn = lag2.name;
+            }
+            
+            if (sökLag) {
+                let spelare = sökLag.startelva.find(p => p.number == nummer);
+                if (spelare) {
+                    let spelarNamn = `${spelare.firstName} ${spelare.lastName}`;
+                    let lagKortnamn = råttLagnamn.toLowerCase().endsWith('s') ? råttLagnamn : `${råttLagnamn}s`;
+                    
+                    if (spelare.goalkeeper) {
+                        return `${lagKortnamn} målvakt ${spelarNamn}`;
+                    } else {
+                        return `${lagKortnamn} ${spelarNamn}`;
+                    }
+                }
+            }
+            return match;
+        });
+        
+        let bildtext = `${transformeradText.trim()} ${brodtextMall.trim()}`;
+        globalGenereradText = bildtext;
+        let preview = document.getElementById('preview');
+        preview.innerText = bildtext;
+        preview.style.display = 'block';
+    }
+
+    function hanteraKeypress(event) {
+        if (event.key === 'Enter') {
+            event.preventDefault(); 
+            kopieraTillUrklipp();
+        }
+    }
+
+    function kopieraTillUrklipp() {
+        if (globalGenereradText) {
+            navigator.clipboard.writeText(globalGenereradText);
+            visaToast("✓ KOPIERAD TILL URKLIPP!");
+            document.getElementById('macro-input').value = '';
+            document.getElementById('preview').style.display = 'none';
+            globalGenereradText = "";
+        } else {
+            visaToast("⚠️ Skriv en giltig kod först");
+        }
+    }
+
+    // UPPDATERAD EXPORT-FUNKTION MED STRÄNG "SPARA SOM"-DIALOGRUTAN
+    async function laddaNerEspanso() {
+        if (!matchData || matchData.teams.length < 2) return;
+        
+        // Hämtar bokstäverna du har valt i rutorna just nu (t.ex. "aik" eller "H")
+        let cmdLag1 = document.getElementById('cmd-lag1').value;
+        let cmdLag2 = document.getElementById('cmd-lag2').value;
+        
+        let yaml = "matches:\n";
+        
+        // Bygg Lag 1 (Hemma) med din valda bokstav + punkt på slutet
+        let lag1 = matchData.teams[0];
+        let lag1Namn = lag1.name.toLowerCase().endsWith('s') ? lag1.name : lag1.name + "s";
+        lag1.startelva.forEach(p => {
+            let roll = p.goalkeeper ? " målvakt " : " ";
+            yaml += `  - trigger: "${cmdLag1}${p.number}."\n`;
+            yaml += `    replace: "${lag1Namn}${roll}${p.firstName} ${p.lastName}"\n`;
+        });
+        
+        // Bygg Lag 2 (Borta) med din valda bokstav + punkt på slutet
+        let lag2 = matchData.teams[1];
+        let lag2Namn = lag2.name.toLowerCase().endsWith('s') ? lag2.name : lag2.name + "s";
+        lag2.startelva.forEach(p => {
+            let roll = p.goalkeeper ? " målvakt " : " ";
+            yaml += `  - trigger: "${cmdLag2}${p.number}."\n`;
+            yaml += `    replace: "${lag2Namn}${roll}${p.firstName} ${p.lastName}"\n`;
+        });
+        
+        // Skapa det snygga automatiska filnamnet baserat på din valda bokstav
+        let städatLag1 = lag1.name.replace(/\s+/g, '_');
+        let filnamn = `Fotboll_${städatLag1}_${cmdLag1}.yml`;
+
+        // 🚀 MAGIN: Tvingar fram Windows "Spara som"-ruta i Chrome/Edge
+        if ('showSaveFilePicker' in window) {
+            try {
+                const options = {
+                    suggestedName: filnamn,
+                    types: [{
+                        description: 'Espanso YAML-mall',
+                        accept: {'text/yaml': ['.yml']},
+                    }],
+                };
+                // Denna rad stoppar koden och öppnar Windows-fönstret: "Var vill du spara?"
+                const handle = await window.showSaveFilePicker(options);
+                const writable = await handle.createWritable();
+                await writable.write(yaml);
+                await writable.close();
+                visaToast(`✓ Sparad direkt i din valda mapp!`);
+            } catch (err) {
+                // Om användaren klickar på "Avbryt" i Windows-rutan händer ingenting
+                if (err.name !== 'AbortError') {
+                    console.error(err);
+                    alert('Kunde inte spara filen via dialogrutan.');
+                }
+            }
+        } else {
+            // Klassisk fallback om webbläsaren är gammal
+            let blob = new Blob([yaml], { type: "text/yaml;charset=utf-8;" });
+            let link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = filnamn;
+            link.style.display = 'none';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            visaToast(`✓ Filen laddades ner!`);
+        }
+    }
+</script>
 </body>
 </html>
